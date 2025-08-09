@@ -28,8 +28,8 @@
       text-align: center;
     }
     #popup {
-      background: #d1ffd6;
-      border: 1px solid #3a9d23;
+      background: #d1e7ff;
+      border: 1px solid #2a6fdb;
       padding: 15px;
       margin-top: 20px;
       font-weight: bold;
@@ -51,7 +51,7 @@
     <button type="submit">Check In</button>
   </form>
 
-  <div id="popup">Styling clock started! Remember, do not start until stylist begins.</div>
+  <div id="popup">Styling timer started! Please wait for your stylist to begin.</div>
 
   <table id="logTable" style="display:none;">
     <thead>
@@ -59,7 +59,6 @@
         <th>Client Name</th>
         <th>Check-in Time</th>
         <th>Check-out Time</th>
-        <th>Check-out Location</th>
       </tr>
     </thead>
     <tbody>
@@ -69,7 +68,6 @@
   <button id="checkoutBtn" style="display:none; margin-top:20px;">Check Out</button>
 
   <script>
-    const validCodes = ['ABC123', 'XYZ789', 'HELLO2025']; // Example valid codes
     const checkinForm = document.getElementById('checkinForm');
     const popup = document.getElementById('popup');
     const logTable = document.getElementById('logTable');
@@ -85,66 +83,55 @@
       const name = document.getElementById('clientName').value.trim();
       const code = document.getElementById('code').value.trim();
 
-      if (!validCodes.includes(code)) {
-        alert('Invalid code. Please check your email and try again.');
+      if (!code) {
+        alert('Please enter your specialized code.');
         return;
       }
 
-      // Save current client and check-in time
-      currentClient = name;
-      checkinTime = new Date();
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser.');
+        return;
+      }
 
-      // Add row to table
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${name}</td>
-        <td>${checkinTime.toLocaleString()}</td>
-        <td id="checkoutTimeCell">-</td>
-        <td id="checkoutLocationCell">-</td>
-      `;
-      tbody.appendChild(row);
+      navigator.geolocation.getCurrentPosition(position => {
+        currentClient = name;
+        checkinTime = new Date();
 
-      logTable.style.display = 'table';
-      popup.style.display = 'block';
-      checkoutBtn.style.display = 'inline-block';
+        // Add row to table
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${name}</td>
+          <td>${checkinTime.toLocaleString()}</td>
+          <td id="checkoutTimeCell">-</td>
+        `;
+        tbody.appendChild(row);
 
-      checkinForm.style.display = 'none';
+        logTable.style.display = 'table';
+        popup.style.display = 'block';
+        checkoutBtn.style.display = 'inline-block';
 
-      alert('Clock started! Do not start styling until your stylist begins.');
+        checkinForm.style.display = 'none';
+
+        alert('You are checked in. The timer has started for your stylist.');
+      }, err => {
+        alert('Failed to get location: ' + err.message);
+      });
     });
 
     checkoutBtn.addEventListener('click', () => {
       if (!currentClient) return alert('No client checked in.');
 
-      if (!navigator.geolocation) {
-        alert('Geolocation not supported by your browser.');
-        return;
-      }
+      const checkoutTime = new Date();
 
-      navigator.geolocation.getCurrentPosition(position => {
-        const checkoutTime = new Date();
-        const lat = position.coords.latitude.toFixed(5);
-        const lon = position.coords.longitude.toFixed(5);
+      // Update checkout cell
+      const checkoutTimeCell = document.getElementById('checkoutTimeCell');
+      checkoutTimeCell.textContent = checkoutTime.toLocaleString();
 
-        // Update checkout cells
-        const checkoutTimeCell = document.getElementById('checkoutTimeCell');
-        const checkoutLocationCell = document.getElementById('checkoutLocationCell');
-        checkoutTimeCell.textContent = checkoutTime.toLocaleString();
-        checkoutLocationCell.textContent = `Lat: ${lat}, Lon: ${lon}`;
+      alert('Checked out! Please proceed to payment and leave a review.');
 
-        alert('Checked out! Please proceed to payment.');
+      checkoutBtn.disabled = true;
 
-        // Simulate payment prompt and review
-        const pay = confirm('Pay remaining balance now?');
-        if (pay) {
-          alert('Payment successful! Please leave a review.');
-          // Here you could open a review form or redirect
-        }
-
-        checkoutBtn.disabled = true;
-      }, err => {
-        alert('Failed to get location: ' + err.message);
-      });
+      // Here you can add payment and review prompts as needed
     });
   </script>
 
