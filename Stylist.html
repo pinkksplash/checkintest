@@ -1,164 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Stylist Check-in</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 600px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-    label, input, button {
-      display: block;
-      width: 100%;
-      margin-bottom: 15px;
-      font-size: 16px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 30px;
-    }
-    th, td {
-      border: 1px solid #999;
-      padding: 8px;
-      text-align: center;
-    }
-    #popup {
-      background: #d1e7ff;
-      border: 1px solid #2a6fdb;
-      padding: 15px;
-      margin-top: 20px;
-      font-weight: bold;
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stylist Check-in</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+  label, input, button { display: block; width: 100%; margin-bottom: 15px; font-size: 16px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 30px; }
+  th, td { border: 1px solid #999; padding: 8px; text-align: center; }
+  #popup { background: #d1e7ff; border: 1px solid #2a6fdb; padding: 15px; margin-top: 20px; font-weight: bold; display: none; }
+</style>
 </head>
 <body>
 
-  <h1>Stylist Check-in</h1>
+<h1>Stylist Check-in</h1>
 
-  <form id="checkinForm">
-    <label for="stylistName">Your Name:</label>
-    <input type="text" id="stylistName" required />
+<form id="checkinForm">
+  <label for="stylistName">Your Name:</label>
+  <input type="text" id="stylistName" required />
 
-    <label for="code">Enter your specialized code:</label>
-    <input type="text" id="code" required />
+  <label for="code">Enter your specialized code:</label>
+  <input type="text" id="code" required />
 
-    <button type="submit">Check In</button>
-  </form>
+  <button type="submit">Check In</button>
+</form>
 
-  <div id="popup">Styling timer started! Please remember to check out when done.</div>
+<div id="popup">Styling timer started! Please remember to check out when done.</div>
 
-  <table id="logTable" style="display:none;">
-    <thead>
-      <tr>
-        <th>Stylist Name</th>
-        <th>Check-in Time</th>
-        <th>Check-in Location</th>
-        <th>Check-out Time</th>
-        <th>Check-out Location</th>
-      </tr>
-    </thead>
-    <tbody>
-    </tbody>
-  </table>
+<table id="logTable" style="display:none;">
+  <thead>
+    <tr>
+      <th>Stylist Name</th>
+      <th>Check-in Time</th>
+      <th>Check-in Location</th>
+      <th>Check-out Time</th>
+      <th>Check-out Location</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
-  <button id="checkoutBtn" style="display:none; margin-top:20px;">Check Out</button>
+<button id="checkoutBtn" style="display:none; margin-top:20px;">Check Out</button>
 
-  <script>
-    const checkinForm = document.getElementById('checkinForm');
-    const popup = document.getElementById('popup');
-    const logTable = document.getElementById('logTable');
-    const tbody = logTable.querySelector('tbody');
-    const checkoutBtn = document.getElementById('checkoutBtn');
+<script>
+  const checkinForm = document.getElementById('checkinForm');
+  const popup = document.getElementById('popup');
+  const logTable = document.getElementById('logTable');
+  const tbody = logTable.querySelector('tbody');
+  const checkoutBtn = document.getElementById('checkoutBtn');
 
-    let currentStylist = null;
-    let checkinTime = null;
+  let currentStylist = null;
+  let checkinTime = null;
 
-    checkinForm.addEventListener('submit', e => {
-      e.preventDefault();
+  checkinForm.addEventListener('submit', e => {
+    e.preventDefault();
 
-      const name = document.getElementById('stylistName').value.trim();
-      const code = document.getElementById('code').value.trim();
+    const name = document.getElementById('stylistName').value.trim();
+    const code = document.getElementById('code').value.trim();
 
-      if (!code) {
-        alert('Please enter your specialized code.');
-        return;
-      }
+    // ANY code passes for testing, only check it's not empty
+    if (!code) {
+      alert('Please enter your specialized code.');
+      return;
+    }
 
-      if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser.');
-        return;
-      }
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
 
-      navigator.geolocation.getCurrentPosition(position => {
-        currentStylist = name;
-        checkinTime = new Date();
+    navigator.geolocation.getCurrentPosition(position => {
+      currentStylist = name;
+      checkinTime = new Date();
 
-        const lat = position.coords.latitude.toFixed(5);
-        const lon = position.coords.longitude.toFixed(5);
+      const lat = position.coords.latitude.toFixed(5);
+      const lon = position.coords.longitude.toFixed(5);
 
-        // Add row to table
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${name}</td>
-          <td>${checkinTime.toLocaleString()}</td>
-          <td>Lat: ${lat}, Lon: ${lon}</td>
-          <td id="checkoutTimeCell">-</td>
-          <td id="checkoutLocationCell">-</td>
-        `;
-        tbody.appendChild(row);
+      // Add row to table
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${name}</td>
+        <td>${checkinTime.toLocaleString()}</td>
+        <td>Lat: ${lat}, Lon: ${lon}</td>
+        <td id="checkoutTimeCell">-</td>
+        <td id="checkoutLocationCell">-</td>
+      `;
+      tbody.appendChild(row);
 
-        logTable.style.display = 'table';
-        popup.style.display = 'block';
-        checkoutBtn.style.display = 'inline-block';
+      logTable.style.display = 'table';
+      popup.style.display = 'block';
+      checkoutBtn.style.display = 'inline-block';
 
-        checkinForm.style.display = 'none';
+      checkinForm.style.display = 'none';
 
-        alert('Styling timer started! Please remember to check out when done.');
-      }, err => {
-        alert('Failed to get location: ' + err.message);
-      });
+      alert('Styling timer started! Please remember to check out when done.');
+    }, err => {
+      alert('Failed to get location: ' + err.message);
     });
+  });
 
-    checkoutBtn.addEventListener('click', () => {
-      if (!currentStylist) return alert('No stylist checked in.');
+  checkoutBtn.addEventListener('click', () => {
+    if (!currentStylist) return alert('No stylist checked in.');
 
-      if (!navigator.geolocation) {
-        alert('Geolocation is not supported by your browser.');
-        return;
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(position => {
+      const checkoutTime = new Date();
+      const lat = position.coords.latitude.toFixed(5);
+      const lon = position.coords.longitude.toFixed(5);
+
+      // Update checkout cells
+      const checkoutTimeCell = document.getElementById('checkoutTimeCell');
+      const checkoutLocationCell = document.getElementById('checkoutLocationCell');
+      checkoutTimeCell.textContent = checkoutTime.toLocaleString();
+      checkoutLocationCell.textContent = `Lat: ${lat}, Lon: ${lon}`;
+
+      alert('Checked out! Payment received from client.');
+
+      // Simulate rating client prompt
+      const rate = confirm('Would you like to rate your client now?');
+      if (rate) {
+        alert('Thank you for rating your client!');
+        // You can add rating form or redirect here
       }
 
-      navigator.geolocation.getCurrentPosition(position => {
-        const checkoutTime = new Date();
-        const lat = position.coords.latitude.toFixed(5);
-        const lon = position.coords.longitude.toFixed(5);
-
-        // Update checkout cells
-        const checkoutTimeCell = document.getElementById('checkoutTimeCell');
-        const checkoutLocationCell = document.getElementById('checkoutLocationCell');
-        checkoutTimeCell.textContent = checkoutTime.toLocaleString();
-        checkoutLocationCell.textContent = `Lat: ${lat}, Lon: ${lon}`;
-
-        alert('Checked out! Payment received from client.');
-
-        // Simulate rating client prompt
-        const rate = confirm('Would you like to rate your client now?');
-        if (rate) {
-          alert('Thank you for rating your client!');
-          // Here you could open a rating form or redirect
-        }
-
-        checkoutBtn.disabled = true;
-      }, err => {
-        alert('Failed to get location: ' + err.message);
-      });
+      checkoutBtn.disabled = true;
+    }, err => {
+      alert('Failed to get location: ' + err.message);
     });
-  </script>
+  });
+</script>
 
 </body>
 </html>
