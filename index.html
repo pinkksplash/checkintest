@@ -14,12 +14,18 @@
     }
     h1 {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
+    }
+    p.intro {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 16px;
+      color: #555;
     }
     button {
       font-size: 18px;
       padding: 12px 24px;
-      margin: 10px 10px 30px 10px;
+      margin: 10px 10px 20px 10px;
       cursor: pointer;
       border: none;
       border-radius: 6px;
@@ -30,12 +36,28 @@
     button:hover {
       background: #0056b3;
     }
+    form {
+      max-width: 400px;
+      margin: 0 auto 30px auto;
+      background: white;
+      padding: 20px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 30px;
       background: white;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
     th, td {
       border: 1px solid #ddd;
@@ -45,62 +67,53 @@
     th {
       background: #f2f2f2;
     }
-    /* Modal styles */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.5);
+    .hidden {
       display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
     }
-    .modal {
-      background: white;
-      padding: 24px 30px;
-      border-radius: 10px;
-      max-width: 400px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    .confirm-section {
       text-align: center;
-      position: relative;
-    }
-    .modal h2 {
-      margin-top: 0;
-    }
-    .modal button.close-btn {
-      position: absolute;
-      top: 12px;
-      right: 12px;
-      background: #eee;
-      border: none;
-      border-radius: 50%;
-      width: 28px;
-      height: 28px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px 10px;
-      margin: 10px 0 20px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      font-size: 16px;
+      margin-bottom: 30px;
     }
   </style>
 </head>
 <body>
 
   <h1>MyStyleUs Check-in</h1>
+  <p class="intro">
+    Hello beautiful! Welcome to your check-in portal.<br/>
+    A 15-minute grace period is provided for your stylist to prepare your space.<br/>
+    When your stylist is ready, check in here to start accurate timing.
+  </p>
 
-  <!-- Buttons to open modals -->
   <div style="text-align:center;">
     <button id="clientBtn">Client Check-in</button>
     <button id="stylistBtn">Stylist Check-in</button>
   </div>
 
-  <!-- Log Table -->
-  <table id="logTable" style="display:none;">
+  <!-- Check-in Form -->
+  <form id="checkinForm" class="hidden">
+    <h2 id="formTitle"></h2>
+    <label for="nameInput">Your Name:</label>
+    <input type="text" id="nameInput" required placeholder="Enter your name" />
+    <label for="codeInput">Specialized Code:</label>
+    <input type="text" id="codeInput" required placeholder="Enter your code" />
+    <button type="submit">Check In</button>
+  </form>
+
+  <!-- Check-out Confirmation -->
+  <div id="checkoutSection" class="confirm-section hidden">
+    <p>Is your style complete and are you ready for payment?</p>
+    <button id="checkoutBtn" style="background:#28a745;">Check Out & Pay</button>
+  </div>
+
+  <!-- Payment Confirmation -->
+  <div id="paymentSection" class="confirm-section hidden">
+    <p>Payment processed! Invoice sent to client. Stylist notified.</p>
+    <button id="resetBtn" style="background:#007bff;">Start New Check-in</button>
+  </div>
+
+  <!-- Logs Table -->
+  <table id="logTable" class="hidden">
     <thead>
       <tr>
         <th>Role</th>
@@ -114,122 +127,40 @@
     <tbody></tbody>
   </table>
 
-  <!-- Welcome Modal -->
-  <div class="modal-overlay" id="welcomeModal">
-    <div class="modal">
-      <button class="close-btn" id="closeWelcome">&times;</button>
-      <h2>Hello beautiful!</h2>
-      <p>
-        Welcome to your check-in portal.<br />
-        A 15-minute grace period is provided to allow your stylist to prepare your beauty space.<br />
-        When your stylist is ready to begin your service, please use this link to check in, as this helps us ensure accurate timing for your appointment.
-      </p>
-      <button id="welcomeOkBtn">Got it!</button>
-    </div>
-  </div>
-
-  <!-- Check-in Modal (used by both client & stylist) -->
-  <div class="modal-overlay" id="checkinModal">
-    <div class="modal">
-      <button class="close-btn" id="closeCheckin">&times;</button>
-      <h2 id="checkinModalTitle">Check-in</h2>
-      <form id="checkinForm">
-        <label for="nameInput" id="nameLabel">Your Name:</label>
-        <input type="text" id="nameInput" required />
-        <label for="codeInput">Enter your specialized code:</label>
-        <input type="text" id="codeInput" required />
-        <button type="submit">Check In</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Check-out Modal -->
-  <div class="modal-overlay" id="checkoutModal">
-    <div class="modal">
-      <button class="close-btn" id="closeCheckout">&times;</button>
-      <h2>Confirm Check-out</h2>
-      <p>Is your style complete and are you ready for payment?</p>
-      <button id="confirmCheckoutBtn" style="background:#28a745;">Yes, Ready for Payment</button>
-    </div>
-  </div>
-
-  <!-- Payment Modal -->
-  <div class="modal-overlay" id="paymentModal">
-    <div class="modal">
-      <button class="close-btn" id="closePayment">&times;</button>
-      <h2>Complete Payment</h2>
-      <p>This will be connected to Stripe for secure payments (placeholder now).</p>
-      <button id="payBtn" style="background:#007bff;">Pay Now</button>
-    </div>
-  </div>
-
 <script>
-  const welcomeModal = document.getElementById('welcomeModal');
-  const closeWelcome = document.getElementById('closeWelcome');
-  const welcomeOkBtn = document.getElementById('welcomeOkBtn');
-
-  const checkinModal = document.getElementById('checkinModal');
-  const closeCheckin = document.getElementById('closeCheckin');
-  const checkinModalTitle = document.getElementById('checkinModalTitle');
-  const checkinForm = document.getElementById('checkinForm');
-  const nameInput = document.getElementById('nameInput');
-  const codeInput = document.getElementById('codeInput');
-
-  const checkoutModal = document.getElementById('checkoutModal');
-  const closeCheckout = document.getElementById('closeCheckout');
-  const confirmCheckoutBtn = document.getElementById('confirmCheckoutBtn');
-
-  const paymentModal = document.getElementById('paymentModal');
-  const closePayment = document.getElementById('closePayment');
-  const payBtn = document.getElementById('payBtn');
-
   const clientBtn = document.getElementById('clientBtn');
   const stylistBtn = document.getElementById('stylistBtn');
-
+  const checkinForm = document.getElementById('checkinForm');
+  const formTitle = document.getElementById('formTitle');
+  const nameInput = document.getElementById('nameInput');
+  const codeInput = document.getElementById('codeInput');
+  const checkoutSection = document.getElementById('checkoutSection');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  const paymentSection = document.getElementById('paymentSection');
+  const resetBtn = document.getElementById('resetBtn');
   const logTable = document.getElementById('logTable');
   const tbody = logTable.querySelector('tbody');
 
-  // State variables
-  let currentRole = null;
-  let currentName = null;
+  let currentRole = '';
+  let currentName = '';
   let currentCheckinTime = null;
   let currentCheckinCoords = null;
   let currentRow = null;
 
-  // Show welcome modal on page load
-  window.onload = () => {
-    welcomeModal.style.display = 'flex';
-  };
-
-  // Close welcome modal
-  closeWelcome.onclick = () => {
-    welcomeModal.style.display = 'none';
-  };
-  welcomeOkBtn.onclick = () => {
-    welcomeModal.style.display = 'none';
-  };
-
-  // Open check-in modal for client or stylist
-  clientBtn.onclick = () => openCheckinModal('Client');
-  stylistBtn.onclick = () => openCheckinModal('Stylist');
-
-  function openCheckinModal(role) {
+  function showCheckinForm(role) {
     currentRole = role;
-    checkinModalTitle.textContent = `${role} Check-in`;
+    formTitle.textContent = `${role} Check-in`;
     nameInput.value = '';
     codeInput.value = '';
-    nameInput.placeholder = `Enter your ${role.toLowerCase()} name`;
-    codeInput.placeholder = 'Enter your specialized code';
-    checkinModal.style.display = 'flex';
+    checkinForm.classList.remove('hidden');
+    checkoutSection.classList.add('hidden');
+    paymentSection.classList.add('hidden');
   }
 
-  // Close check-in modal
-  closeCheckin.onclick = () => {
-    checkinModal.style.display = 'none';
-  };
+  clientBtn.onclick = () => showCheckinForm('Client');
+  stylistBtn.onclick = () => showCheckinForm('Stylist');
 
-  // Handle check-in form submission
-  checkinForm.onsubmit = function(e) {
+  checkinForm.onsubmit = e => {
     e.preventDefault();
 
     const name = nameInput.value.trim();
@@ -240,9 +171,10 @@
       return;
     }
     if (!code) {
-      alert('Please enter your specialized code.');
+      alert('Please enter the specialized code.');
       return;
     }
+
     if (!navigator.geolocation) {
       alert('Geolocation is not supported by your browser.');
       return;
@@ -256,17 +188,72 @@
         lon: position.coords.longitude.toFixed(5)
       };
 
-      // Add or show table
-      if (logTable.style.display === 'none') {
-        logTable.style.display = 'table';
+      // Show the log table if hidden
+      if (logTable.classList.contains('hidden')) {
+        logTable.classList.remove('hidden');
       }
 
-      // Add new row to table
+      // Add a new row with check-in info and placeholders for check-out
       const row = document.createElement('tr');
       row.innerHTML = `
         <td>${currentRole}</td>
         <td>${currentName}</td>
         <td>${currentCheckinTime.toLocaleString()}</td>
         <td>Lat: ${currentCheckinCoords.lat}, Lon: ${currentCheckinCoords.lon}</td>
-        <td id="checkoutTimeCell">-</td>
-        <td id="checkoutLocationCell">-</td>
+        <td class="checkoutTime">-</td>
+        <td class="checkoutLocation">-</td>
+      `;
+      tbody.appendChild(row);
+      currentRow = row;
+
+      checkinForm.classList.add('hidden');
+      checkoutSection.classList.remove('hidden');
+
+      alert(`${currentRole} checked in! Timer started.`);
+
+    }, err => {
+      alert('Failed to get location: ' + err.message);
+    });
+  };
+
+  checkoutBtn.onclick = () => {
+    if (!currentRow) {
+      alert('No check-in record found.');
+      return;
+    }
+
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(position => {
+      const checkoutTime = new Date();
+      const checkoutCoords = {
+        lat: position.coords.latitude.toFixed(5),
+        lon: position.coords.longitude.toFixed(5)
+      };
+
+      // Update the row with check-out data
+      currentRow.querySelector('.checkoutTime').textContent = checkoutTime.toLocaleString();
+      currentRow.querySelector('.checkoutLocation').textContent = `Lat: ${checkoutCoords.lat}, Lon: ${checkoutCoords.lon}`;
+
+      checkoutSection.classList.add('hidden');
+      paymentSection.classList.remove('hidden');
+    }, err => {
+      alert('Failed to get location: ' + err.message);
+    });
+  };
+
+  resetBtn.onclick = () => {
+    paymentSection.classList.add('hidden');
+    currentRow = null;
+    currentName = '';
+    currentCheckinTime = null;
+    currentCheckinCoords = null;
+    showCheckinForm(''); // Show no form by default
+  };
+</script>
+
+</body>
+</html>
