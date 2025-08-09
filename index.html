@@ -251,9 +251,13 @@
     currentName = '';
     currentCheckinTime = null;
     currentCheckinCoords = null;
-    showCheckinForm(''); // Show no form by default
+
+    // Hide the checkin form and checkout section on reset
+    checkinForm.classList.add('hidden');
+    checkoutSection.classList.add('hidden');
   };
 </script>
 
 </body>
 </html>
+
