@@ -70,8 +70,6 @@
   <button id="checkoutBtn" style="display:none; margin-top:20px;">Check Out</button>
 
   <script>
-    const validCodes = ['ABC123', 'XYZ789', 'HELLO2025']; // Example valid codes
-
     const checkinForm = document.getElementById('checkinForm');
     const popup = document.getElementById('popup');
     const logTable = document.getElementById('logTable');
@@ -87,8 +85,8 @@
       const name = document.getElementById('stylistName').value.trim();
       const code = document.getElementById('code').value.trim();
 
-      if (!validCodes.includes(code)) {
-        alert('Invalid code. Please check your email and try again.');
+      if (!code) {
+        alert('Please enter your specialized code.');
         return;
       }
 
@@ -131,7 +129,7 @@
       if (!currentStylist) return alert('No stylist checked in.');
 
       if (!navigator.geolocation) {
-        alert('Geolocation not supported by your browser.');
+        alert('Geolocation is not supported by your browser.');
         return;
       }
 
